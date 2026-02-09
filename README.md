@@ -34,6 +34,7 @@ The project is organized to separate concerns and ensure maintainability:
 ├── docker-compose.yml   # Database orchestration
 ├── .env                 # Environment variables
 └── README.md
+```
 
 ## 📚 Documentation
 - [Setup & Installation Guide](./SETUP.md)
