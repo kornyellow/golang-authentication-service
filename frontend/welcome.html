@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - IT 02-3</title>
+    <style>
+        body {
+            background-color: #0f0f23;
+            color: #cccccc;
+            font-family: "Source Code Pro", monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            border: 1px solid #333;
+            padding: 40px;
+            background: #10101a;
+            width: 400px;
+        }
+        h1 { color: #00cc00; margin-bottom: 10px; }
+        .user-badge {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px dashed #555;
+            color: #ffff66;
+            font-size: 1.2em;
+        }
+        button {
+            background: #cc0000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            margin-top: 20px;
+            width: 100%;
+        }
+        button:hover { background: #ff0000; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>ACCESS GRANTED</h1>
+        <p>System Level: IT 02-3</p>
+        
+        <div class="user-badge">
+            USER: <span id="usernameDisplay">Loading...</span>
+        </div>
+
+        <button id="logoutBtn">[ LOGOUT SYSTEM ]</button>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+
+        // 1. Check local token presence
+        if (!token) {
+            alert("Access Denied. Please login.");
+            window.location.href = 'index.html';
+        }
+
+        // 2. Validate token with backend
+        async function fetchProfile() {
+            try {
+                const res = await fetch('http://localhost:8080/api/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('usernameDisplay').textContent = data.user;
+                } else {
+                    throw new Error("Session Expired");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Session expired. Please login again.");
+                localStorage.clear();
+                window.location.href = 'index.html';
+            }
+        }
+
+        // 3. Logout Logic
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if(confirm("Terminate session?")) {
+                localStorage.clear();
+                window.location.href = 'index.html';
+            }
+        });
+
+        fetchProfile();
+    </script>
+</body>
+</html>

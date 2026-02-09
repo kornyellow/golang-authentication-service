@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - IT 02-1</title>
+    <style>
+        body {
+            background-color: #0f0f23; 
+            color: #cccccc;
+            font-family: "Source Code Pro", monospace; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+        }
+        h2 { color: #00cc00; text-shadow: 0 0 5px #00cc00; }
+        form { display: flex; flex-direction: column; width: 300px; gap: 10px; }
+        input {
+            background: #10101a;
+            border: 1px solid #555;
+            color: white;
+            padding: 5px;
+            font-family: inherit;
+        }
+        button {
+            background: #009900;
+            color: white;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+        }
+        button:hover { background: #00cc00; }
+        a { color: #ffff66; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+    </style>
+</head>
+<body>
+
+    <h2>--- Login (IT 02-1) ---</h2>
+    
+    <form id="loginForm">
+        <label>Username:</label>
+        <input type="text" id="username" required autofocus>
+
+        <label>Password:</label>
+        <input type="password" id="password" required>
+
+        <button type="submit">[ Enter System ]</button>
+    </form>
+
+    <p id="message"></p>
+
+    <p style="margin-top: 20px; font-size: 0.9em;">
+        New user? <a href="register.html">[ Register (IT 02-2) ]</a>
+    </p>
+
+    <script>
+        // Redirect if token exists
+        if (localStorage.getItem('token')) {
+            window.location.href = 'welcome.html';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const msg = document.getElementById('message');
+
+            msg.textContent = "Processing...";
+            msg.className = "";
+
+            try {
+                const res = await fetch('http://localhost:8080/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    // Success: Store token and redirect
+                    msg.textContent = "Access Granted. Redirecting...";
+                    msg.className = "success";
+                    
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('username', data.username);
+
+                    setTimeout(() => {
+                        window.location.href = 'welcome.html';
+                    }, 1000);
+                } else {
+                    // Error: Show message
+                    msg.textContent = "Error: " + (data.error || "Invalid credentials");
+                    msg.className = "error";
+                }
+            } catch (err) {
+                console.error(err);
+                msg.textContent = "Error: Server unreachable";
+                msg.className = "error";
+            }
+        });
+    </script>
+</body>
+</html>
