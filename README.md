@@ -1,4 +1,4 @@
-# Golang Simple Authentication System
+# Golang Clean Authentication System
 
 This project is a demonstration a complete Authentication System (Login/Register/Profile) using modern Golang practices.
 
